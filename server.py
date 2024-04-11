@@ -29,8 +29,11 @@ class ChunkReceiverThread(threading.Thread):
             while True:
                 try:
                     data = conn.recv(1024)
+                    if data:
                     # logger.debug(f"Received: {data}")
-                    self.queue.put(data.decode())
+                        self.queue.put(data.decode())
+                    else:
+                        break
                 except ConnectionResetError:
                     break
                 

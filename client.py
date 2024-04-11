@@ -4,8 +4,8 @@ import pyaudio
 import threading
 
 class ChunkSenderThread():
-    def __init__(self):
-        # super().__init__()
+    def __init__(self, stop_event):
+        self.stop_event = stop_event
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect(('192.168.1.100', 10500))
         
@@ -14,15 +14,16 @@ class ChunkSenderThread():
             user_input = input('Enter your speech')
             
             if user_input.lower() == 'quit':
+                self.stop_event.set()
                 break
             
             self.s.sendall(user_input.encode())
         logger.debug('Exiting ChunkSender')
 
 class SpeakingThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, stop_event):
         super().__init__()
-        
+        self.stop_event = stop_event
         HOST = '192.168.1.100'
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.settimeout(1)
@@ -34,7 +35,7 @@ class SpeakingThread(threading.Thread):
         self.stream = self.p.open(format=2, channels=CHANNELS, rate=RATE, output=True)
         
     def run(self):
-        while True:
+        while not self.stop_event.is_set():
             try:
                 data = self.s.recv(512)
                 self.stream.write(data)
@@ -54,8 +55,9 @@ class SpeakingThread(threading.Thread):
         
         
 if __name__ == "__main__":
-    speaking_thread = SpeakingThread()
-    chunk_sender_thread = ChunkSenderThread()
+    stop_event = threading.Event()
+    speaking_thread = SpeakingThread(stop_event)
+    chunk_sender_thread = ChunkSenderThread(stop_event)
     speaking_thread.start()
     chunk_sender_thread.run()
     
