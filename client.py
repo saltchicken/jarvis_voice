@@ -39,18 +39,14 @@ class SpeakingThread(threading.Thread):
             try:
                 data = self.s.recv(512)
                 self.stream.write(data)
-            except KeyboardInterrupt as e:
-                logger.debug("Keyboard Interrupt")
-                self.stream.stop_stream()
-                self.stream.close()
-                self.p.terminate()
-                break
             except socket.timeout:
                 continue
             
             except Exception as e:
                 print(e)
-
+        self.stream.stop_stream()
+        self.stream.close()
+        self.p.terminate()
         self.s.close()
         
         

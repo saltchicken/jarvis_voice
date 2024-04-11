@@ -33,8 +33,10 @@ class ChunkReceiverThread(threading.Thread):
                     # logger.debug(f"Received: {data}")
                         self.queue.put(data.decode())
                     else:
+                        logger.debug('Received no data: braeking')
                         break
                 except ConnectionResetError:
+                    logger.debug('Received ConnectionReset, breaking')
                     break
                 
          
@@ -49,9 +51,12 @@ class VoiceGenerator():
         chunk_receiver.run()
         
         self.engine = CoquiEngine()
-        format, a, b = self.engine.get_stream_info()
+        # format, a, b = self.engine.get_stream_info()
         
         self.stream = TextToAudioStream(self.engine)
+        # TODO: Why is this initialization needed?
+        self.stream.feed('a')
+        self.stream.play_async(tokenizer="stanza", language="en", on_audio_chunk=lambda x: x, muted=True)
         
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -66,10 +71,6 @@ class VoiceGenerator():
         self.conn.sendall(chunk)
         
     def run(self):
-        # TODO: Why is this initialization needed?
-        self.stream.feed('a')
-        self.stream.play_async(tokenizer="stanza", language="en", on_audio_chunk=lambda x: x, muted=True)
-        # self.stream.feed("Test one")
         while True:
             text = self.queue.get()
             logger.debug(f"Text for TTS: {text}")
