@@ -23,12 +23,17 @@ class ChunkReceiverThread(threading.Thread):
         receive_thread.start()
             
     def handle_client(self):
-        conn, addr = self.socket.accept()
-        logger.debug("ChunkReceiver connected")
         while True:
-            data = conn.recv(1024)
-            # logger.debug(f"Received: {data}")
-            self.queue.put(data.decode())
+            conn, addr = self.socket.accept()
+            logger.debug("ChunkReceiver connected")
+            while True:
+                try:
+                    data = conn.recv(1024)
+                    # logger.debug(f"Received: {data}")
+                    self.queue.put(data.decode())
+                except ConnectionResetError:
+                    break
+                
          
             
 
