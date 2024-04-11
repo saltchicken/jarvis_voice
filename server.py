@@ -12,6 +12,7 @@ class ChunkReceiverThread(threading.Thread):
     def __init__(self, queue):
         super().__init__()
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.settimeout(1)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.queue = queue
         
@@ -35,6 +36,9 @@ class ChunkReceiverThread(threading.Thread):
                     else:
                         logger.debug('Received no data: braeking')
                         break
+                except socket.timeout:
+                    logger.debug("ChunkReceiver socket timed out")
+                    continue
                 except ConnectionResetError:
                     logger.debug('Received ConnectionReset, breaking')
                     break
