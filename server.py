@@ -25,7 +25,10 @@ class ChunkReceiverThread(threading.Thread):
             
     def handle_client(self):
         while True:
-            conn, addr = self.socket.accept()
+            try:
+                conn, addr = self.socket.accept()
+            except socket.timeout:
+                continue
             logger.debug("ChunkReceiver connected")
             while True:
                 try:
