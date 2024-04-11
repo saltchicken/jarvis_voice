@@ -27,7 +27,7 @@ class ChunkReceiverThread(threading.Thread):
         logger.debug("ChunkReceiver connected")
         while True:
             data = conn.recv(1024)
-            logger.debug(f"Received: {data}")
+            # logger.debug(f"Received: {data}")
             self.queue.put(data.decode())
          
             

@@ -43,6 +43,7 @@ class SpeakingThread(threading.Thread):
         HOST = '192.168.1.100'
         # Create a socket connection.
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.settimeout(1)
         self.s.connect((HOST, 10501))
         
 
@@ -64,10 +65,12 @@ class SpeakingThread(threading.Thread):
         while True:
             try:
                 data = self.s.recv(512)
-                logger.debug(f"Received: {len(data)}")
+                # logger.debug(f"Received: {len(data)}")
                 self.stream.write(data)
                 # audio_collection += data
                 # wf.writeframes(data)
+            except socket.timeout:
+                continue
             except KeyboardInterrupt as e:
                 logger.debug("Keyboard Interrupt")
                 # stream.write(audio_collection)
