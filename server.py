@@ -19,11 +19,11 @@ class ChunkReceiverThread(threading.Thread):
     def run(self):
         self.socket.bind(('0.0.0.0', 10500))
         self.socket.listen()
-        logger.debug("ChunkReceiver listening")
         receive_thread = threading.Thread(target=self.handle_client)
         receive_thread.start()
             
     def handle_client(self):
+        logger.debug("ChunkReceiver listening")
         while True:
             try:
                 conn, addr = self.socket.accept()
@@ -38,6 +38,8 @@ class ChunkReceiverThread(threading.Thread):
                         self.queue.put(data.decode())
                     else:
                         logger.debug('Received no data: braeking')
+                        logger.debug('Sending literal "quit". This should be done better')
+                        self.queue.put('quit'.decode())
                         break
                 except socket.timeout:
                     logger.debug("ChunkReceiver socket timed out")
@@ -80,9 +82,16 @@ class VoiceGenerator():
     def run(self):
         while True:
             text = self.queue.get()
-            logger.debug(f"Text for TTS: {text}")
-            self.stream.feed(text)
-            self.stream.play_async(tokenizer="stanza", language="en", on_audio_chunk=self.on_audio_chunk_callback, muted=True)
+            if text == b'quit':
+                logger.debug('Quit received')
+                logger.debug('Waiting for connection')
+                self.conn, addr = self.server_socket.accept()
+                logger.debug("VoiceGenerator connected")
+                continue
+            else:
+                logger.debug(f"Text for TTS: {text}")
+                self.stream.feed(text)
+                self.stream.play_async(tokenizer="stanza", language="en", on_audio_chunk=self.on_audio_chunk_callback, muted=True)
         # embed()
         # time.sleep(3)
         # self.stream.feed('Test two')
