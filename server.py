@@ -39,7 +39,7 @@ class ChunkReceiverThread(threading.Thread):
                     else:
                         logger.debug('Received no data: braeking')
                         logger.debug('Sending literal "quit". This should be done better')
-                        self.queue.put('quit'.decode())
+                        self.queue.put('quit')
                         break
                 except socket.timeout:
                     logger.debug("ChunkReceiver socket timed out")
@@ -82,7 +82,7 @@ class VoiceGenerator():
     def run(self):
         while True:
             text = self.queue.get()
-            if text == b'quit':
+            if text == 'quit':
                 logger.debug('Quit received')
                 logger.debug('Waiting for connection')
                 self.conn, addr = self.server_socket.accept()
