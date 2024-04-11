@@ -20,7 +20,7 @@ class ChunkSenderThread():
     def __init__(self):
         # super().__init__()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect(('192.168.1.100', PORT_INC+101))
+        self.s.connect(('192.168.1.100', 10500))
         
     def run(self):
         while True:
@@ -43,7 +43,7 @@ class SpeakingThread(threading.Thread):
         HOST = '192.168.1.100'
         # Create a socket connection.
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect((HOST, PORT_INC + 1))
+        self.s.connect((HOST, 10501))
         
 
         self.p = pyaudio.PyAudio()

@@ -6,7 +6,7 @@ import threading, queue
 
 from IPython import embed
 
-PORT_INC = 10098
+
 
 class ChunkReceiverThread(threading.Thread):
     def __init__(self, queue):
@@ -16,7 +16,7 @@ class ChunkReceiverThread(threading.Thread):
         self.queue = queue
         
     def run(self):
-        self.socket.bind(('0.0.0.0', PORT_INC+101))
+        self.socket.bind(('0.0.0.0', 10500))
         self.socket.listen()
         logger.debug("ChunkReceiver listening")
         receive_thread = threading.Thread(target=self.handle_client)
@@ -47,7 +47,7 @@ class VoiceGenerator():
         
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server_socket.bind(('0.0.0.0', PORT_INC+1))
+        self.server_socket.bind(('0.0.0.0', 10501))
         self.server_socket.listen(1)
         logger.debug('Waiting for connection')
         self.conn, addr = self.server_socket.accept()
