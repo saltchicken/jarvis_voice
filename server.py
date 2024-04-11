@@ -59,8 +59,8 @@ class VoiceGenerator():
         
     def run(self):
         # TODO: Why is this initialization needed?
-        self.stream.feed('')
-        self.stream.play_async(tokenizer="stanza", language="en", on_audio_chunk=self.on_audio_chunk_callback, muted=True)
+        self.stream.feed('a')
+        self.stream.play_async(tokenizer="stanza", language="en", on_audio_chunk=lambda x: x, muted=True)
         # self.stream.feed("Test one")
         while True:
             text = self.queue.get()
