@@ -76,7 +76,7 @@ class VoiceGenerator():
         logger.debug("VoiceGenerator connected")
         
     def on_audio_chunk_callback(self, chunk):
-        logger.debug(f"Chunk received:, len: {len(chunk)}")
+        # logger.debug(f"Chunk received:, len: {len(chunk)}")
         self.conn.sendall(chunk)
         
     def run(self):
